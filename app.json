@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.spraveenitpro.ourwallet"
+      "bundleIdentifier": "com.spraveenitpro.ourwallet",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,6 +29,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8b493535-b9a7-423a-a514-f55687c40ab4"
+      }
+    },
+    "owner": "spraveenitpro"
   }
 }

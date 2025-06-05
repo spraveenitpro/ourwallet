@@ -1,11 +1,10 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
 import * as liquidSdk from "@breeztech/react-native-breez-sdk-liquid";
 import {
   defaultConfig,
   LiquidNetwork,
-  SdkEvent,
-  SdkEventVariant,
 } from "@breeztech/react-native-breez-sdk-liquid";
 
 async function initSdk() {
@@ -17,30 +16,41 @@ async function initSdk() {
   const mnemonic = process.env.EXPO_PUBLIC_MNEMONIC;
   if (!mnemonic) throw Error("No mnemonic found");
 
-  await liquidSdk.connect({ config, mnemonic });
-  await liquidSdk.addEventListener(onEvent).catch(console.error);
-}
-
-async function onEvent(e) {
-  console.log("RECEIVED NEW EVENT", e);
-  switch (e.type) {
-    case SdkEventVariant.SYNCED:
-      liquidSdk
-        .getInfo()
-        .then((info) => store.dispatch(setInfo(info)))
-        .catch(console.error);
-      liquidSdk
-        .listPayments({ limit: undefined })
-        .then((payments) => store.dispatch(setPayments(payments)))
-        .catch(console.error);
-      break;
+  try {
+    await liquidSdk.connect({ mnemonic, config });
+    console.log("Breez SDK connected!");
+  } catch (err) {
+    console.error("Failed to connect Breez SDK:", err);
   }
 }
 
 export default function App() {
+  let [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    initSdk().then(() => setConnected(true));
+
+    return () => {
+      liquidSdk.disconnect();
+      setConnected(false);
+    };
+  }, []);
+
+  if (!connected)
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ textAlign: "center" }}>Loading...</Text>
+      </View>
+    );
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Text>Breez SDK connected!!!</Text>
       <StatusBar style="auto" />
     </View>
   );
