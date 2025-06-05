@@ -1,7 +1,11 @@
 import { StatusBar } from "expo-status-bar";
+import { Provider } from "react-redux";
+import { setInfo } from "./store/reducers/info";
+import { store } from "./store";
 import { StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import * as liquidSdk from "@breeztech/react-native-breez-sdk-liquid";
+
 import {
   defaultConfig,
   LiquidNetwork,
@@ -24,7 +28,7 @@ async function initSdk() {
   }
 }
 
-export default function App() {
+function AppContent() {
   let [connected, setConnected] = useState(false);
 
   useEffect(() => {
@@ -36,23 +40,35 @@ export default function App() {
     };
   }, []);
 
-  if (!connected)
-    return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text style={{ textAlign: "center" }}>Loading...</Text>
-      </View>
-    );
+  useEffect(() => {
+    liquidSdk.addEventListener(onEvent);
+    return () => {
+      liquidSdk.removeEventListener(onEvent);
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text>Breez SDK connected!!!</Text>
+      <Text>{connected ? "Breez SDK connected!!!" : "Loading..."}</Text>
       <StatusBar style="auto" />
     </View>
+  );
+}
+
+async function onEvent(e) {
+  if (e.type === "SYNCED") {
+    await liquidSdk
+      .getInfo()
+      .then((info) => store.dispatch(setInfo(info)))
+      .catch(console.error);
+  }
+}
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   );
 }
 
