@@ -18,7 +18,7 @@ export default function WalletInfo({ info }: { info: WalletInfoT }) {
           Pending inward balance: {info.pendingReceiveSat} ₿
         </Text>
       )}
-      Add commentMore actions
+
       {info.pendingSendSat > 0 && (
         <Text style={{ color: "#606060", fontStyle: "italic" }}>
           Pending outward balance: {info.pendingSendSat} ₿
