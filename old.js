@@ -106,7 +106,7 @@ function AppContent() {
 // }
 
 // REPLACE your current onEvent function with this:
-async function onEvent(e: SdkEvent) {
+async function onEvent(e) {
   console.log("RECEIVED NEW EVENT", e);
   switch (e.type) {
     case SdkEventVariant.SYNCED:
