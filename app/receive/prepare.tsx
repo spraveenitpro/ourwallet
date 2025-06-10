@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 import { useNavigation } from "expo-router";
-import { useAppDispatch } from "@/store/hooks";
-import { setReceive } from "@/store/reducers/receive";
+import { useAppDispatch } from "../../store/hooks";
+import { setReceive } from "../../store/reducers/receive";
 
 import * as liquidSdk from "@breeztech/react-native-breez-sdk-liquid";
 import {
