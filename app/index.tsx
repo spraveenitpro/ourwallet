@@ -1,32 +1,64 @@
-// app/index.tsx
-import { useEffect } from "react";
+import React from "react";
 import { Text, View } from "react-native";
-import WalletInfo from "../components/WalletInfo";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { setInfo } from "../store/reducers/info";
-import * as liquidSdk from "@breeztech/react-native-breez-sdk-liquid";
-import { useNavigation } from "expo-router";
+
+import { useEffect } from "react";
+
+import { Link } from "expo-router";
+import WalletInfo from "@/components/WalletInfo";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { getInfo } from "@breeztech/react-native-breez-sdk-liquid";
+import { setInfo } from "@/store/reducers/info";
+import PaymentsList from "@/components/PaymentsList";
 
 export default function Index() {
   const dispatch = useAppDispatch();
   const info = useAppSelector((store) => store.info);
-  const navigation = useNavigation();
 
   useEffect(() => {
-    navigation.setOptions({ title: "Breez Nodeless SDK RN Demo" });
-  }, [navigation]);
-
-  useEffect(() => {
-    liquidSdk
-      .getInfo()
-      .then((info) => dispatch(setInfo(info)))
-      .catch(console.error);
-  }, [dispatch]);
+    getInfo().then((info) => dispatch(setInfo(info)));
+  }, []);
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       {info ? (
-        <WalletInfo info={info.walletInfo} />
+        <>
+          <WalletInfo info={info.walletInfo} />
+          <View style={{ paddingVertical: 5, flexDirection: "row", gap: 5 }}>
+            <Link
+              href="/receive/prepare"
+              style={{
+                paddingVertical: 6,
+                paddingHorizontal: 15,
+                borderColor: "lightgray",
+                borderWidth: 1,
+                borderRadius: 20,
+                color: "#0184fb",
+              }}
+            >
+              Add funds
+            </Link>
+            <Link
+              href="/send/prepare"
+              style={{
+                paddingVertical: 6,
+                paddingHorizontal: 15,
+                borderColor: "lightgray",
+                borderWidth: 1,
+                borderRadius: 20,
+                color: "#0184fb",
+              }}
+            >
+              Send funds
+            </Link>
+          </View>
+          <PaymentsList />
+        </>
       ) : (
         <Text>Loading wallet information...</Text>
       )}

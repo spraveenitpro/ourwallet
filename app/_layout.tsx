@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { store } from "../store";
 import { setInfo } from "../store/reducers/info";
 import * as liquidSdk from "@breeztech/react-native-breez-sdk-liquid";
+import { setPayments } from "@/store/reducers/payments";
 import {
   defaultConfig,
   LiquidNetwork,
@@ -14,17 +15,25 @@ import {
 } from "@breeztech/react-native-breez-sdk-liquid";
 
 async function onEvent(e: SdkEvent) {
-  if (e.type === SdkEventVariant.SYNCED) {
-    await liquidSdk
-      .getInfo()
-      .then((info) => store.dispatch(setInfo(info)))
-      .catch(console.error);
+  console.log("RECEIVED NEW EVENT", e);
+  switch (e.type) {
+    case SdkEventVariant.SYNCED:
+      await liquidSdk.getInfo();
+      liquidSdk
+        .getInfo()
+        .then((info) => store.dispatch(setInfo(info)))
+        .catch(console.error);
+      liquidSdk
+        .listPayments({ limit: undefined })
+        .then((payments) => store.dispatch(setPayments(payments)))
+        .catch(console.error);
+      break;
   }
 }
 
 async function initSdk() {
   const config = await defaultConfig(
-    LiquidNetwork.TESTNET,
+    LiquidNetwork.MAINNET,
     process.env.EXPO_PUBLIC_BREEZ_API_KEY
   );
   const mnemonic = process.env.EXPO_PUBLIC_MNEMONIC;
@@ -51,7 +60,28 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <Stack>
-        <Stack.Screen name="index" />
+        <Stack.Screen
+          name="index"
+          options={{
+            headerTitle: "Breez Nodeless SDK RN Demo",
+          }}
+        />
+        <Stack.Screen
+          name="receive"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="send"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            headerShown: false,
+          }}
+        />
       </Stack>
     </Provider>
   );
